@@ -13,8 +13,10 @@ from .utils import join_nonempty, object_to_text
 
 
 def get_zep_client() -> Zep:
-    if not settings.zep_api_key:
-        raise RuntimeError("ZEP_API_KEY is missing. Copy .env.example to .env and add the key.")
+    if not settings.zep_api_key or settings.zep_api_key == "__USER_PROVIDED_KEY__":
+        raise RuntimeError(
+            "ZEP_API_KEY chưa được cấu hình hợp lệ. Hãy thay placeholder trong .env bằng key Zep Cloud."
+        )
     return Zep(api_key=settings.zep_api_key)
 
 

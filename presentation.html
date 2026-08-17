@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 17 · Multi-Memory Agent</title>
+  <style>
+    :root{--ink:#11252a;--muted:#64757a;--paper:#f5f7f4;--white:#fff;--teal:#087f73;--gold:#efb56c;--line:#d9e5e1}
+    *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .deck{min-height:100vh}.slide{display:none;min-height:calc(100vh - 78px);max-width:1240px;margin:auto;padding:7vh 7vw 9vh;position:relative}.slide.active{display:block}
+    .top{height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 7vw;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .brand{font-weight:800;color:var(--teal)}.count{font-variant-numeric:tabular-nums}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:800;margin-bottom:18px}
+    h1{font-size:clamp(48px,8vw,108px);line-height:.94;letter-spacing:-.07em;max-width:900px;margin:0 0 28px}h2{font-size:clamp(34px,5vw,68px);line-height:1;letter-spacing:-.06em;max-width:850px;margin:0 0 28px}h3{font-size:20px;margin:0 0 8px}p{font-size:18px;line-height:1.6;color:var(--muted);max-width:720px}.lead{font-size:23px;max-width:760px}
+    .opening{display:grid;grid-template-columns:1.15fr .85fr;gap:7vw;align-items:center}.opening:after{content:"01";position:absolute;right:7vw;bottom:5vh;font-size:13vw;line-height:1;color:#e3ebe7;font-weight:900;z-index:-1}
+    .question{background:var(--ink);color:#fff;border-radius:18px;padding:30px;box-shadow:16px 16px 0 var(--gold);font-size:25px;line-height:1.25}.question small{display:block;color:#a9c2bd;font-size:13px;line-height:1.5;margin-top:25px}
+    .answer{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:42px}.box{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:23px;min-height:145px}.box strong{display:block;font-size:32px;color:var(--teal);letter-spacing:-.05em;margin-bottom:8px}.box p{font-size:15px;margin:0}
+    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px}.flow .box{border-radius:0;position:relative}.flow .box:first-child{border-radius:14px 0 0 14px}.flow .box:last-child{border-radius:0 14px 14px 0}.flow .box:not(:last-child):after{content:"→";position:absolute;right:-17px;top:52px;z-index:2;background:var(--gold);border-radius:50%;width:34px;height:34px;text-align:center;padding-top:3px;font-weight:800}.num{font:700 12px ui-monospace,monospace;color:var(--teal)}
+    .layers{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:35px}.layer{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;grid-template-columns:145px 1fr;gap:18px}.layer .tag{font:700 12px ui-monospace,monospace;color:var(--teal)}.layer p{font-size:15px;margin:0}.layer h3{font-size:18px}
+    .demo{display:grid;grid-template-columns:1fr 1fr;gap:35px;align-items:start}.steps{border-top:1px solid var(--line)}.step{display:grid;grid-template-columns:100px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}.step b{color:var(--teal)}.step p{margin:0;font-size:16px}.screen{background:var(--ink);color:#fff;border-radius:16px;padding:26px}.screen .pill{display:inline-block;border:1px solid #53746d;border-radius:99px;padding:6px 10px;margin:4px;color:#cde3dd;font-size:13px}.screen .selected{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:42px 0}.metric{background:var(--ink);color:#fff;border-radius:14px;padding:25px}.metric strong{display:block;font-size:52px;letter-spacing:-.07em;color:var(--gold)}.metric span{color:#c6d7d2}.quote{border-left:4px solid var(--teal);background:#e7f0ec;padding:20px 25px;font-size:20px;line-height:1.5;max-width:850px}
+    .closing{display:grid;grid-template-columns:1fr 1fr;gap:50px}.closing ul{padding:0;margin:0;list-style:none}.closing li{padding:15px 0;border-bottom:1px solid var(--line);font-size:18px}.closing li:before{content:"✓";color:var(--teal);font-weight:800;margin-right:12px}.takeaway{background:var(--teal);color:white;border-radius:18px;padding:30px;align-self:start}.takeaway p{color:#d8eeea;font-size:21px}.notes{display:none}
+    .controls{position:fixed;bottom:20px;right:7vw;display:flex;gap:8px}.controls button{background:var(--white);border:1px solid var(--line);border-radius:9px;padding:9px 14px;color:var(--ink);cursor:pointer}.controls button:hover{background:var(--gold)}
+    @media(max-width:800px){.opening,.demo,.closing{grid-template-columns:1fr}.answer,.flow,.metrics{grid-template-columns:1fr}.flow .box,.flow .box:first-child,.flow .box:last-child{border-radius:14px}.flow .box:not(:last-child):after{content:"↓";right:calc(50% - 17px);top:auto;bottom:-17px}.layers{grid-template-columns:1fr}.layer{grid-template-columns:1fr;gap:6px}.slide{padding:6vh 6vw 12vh}.top{padding:0 6vw}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="top"><span class="brand">LAB 17 / MEMORY SYSTEMS</span><span class="count" id="count">01 / 07</span></div>
+
+  <section class="slide active opening" data-title="Bối cảnh">
+    <div><div class="eyebrow">Mở đầu · vấn đề</div><h1>Agent trả lời đúng hôm nay. Nhưng ngày mai thì sao?</h1><p class="lead">Khi thông tin nằm rải rác qua nhiều phiên trò chuyện, agent sẽ quên preference, task chưa xong và quyết định cũ.</p></div>
+    <div class="question">Nếu user hỏi lại một việc từ tuần trước, agent sẽ nhớ bằng cách nào?<small>Đây là câu hỏi dẫn vào toàn bộ bài lab.</small></div>
+    <div class="notes">Nói: “Hãy tưởng tượng chúng ta đang xây một trợ lý cá nhân. Context hiện tại chỉ nhìn thấy vài tin nhắn gần nhất, nên trí nhớ dài hạn là phần còn thiếu.”</div>
+  </section>
+
+  <section class="slide" data-title="Mục tiêu">
+    <div class="eyebrow">Mục tiêu của lab</div><h2>Không phải lưu tất cả. Là lấy đúng thứ cần thiết.</h2><p>Lab xây dựng một agent có nhiều lớp memory, định tuyến query tới đúng nguồn và kiểm chứng bằng bộ test có ground truth.</p>
+    <div class="answer"><div class="box"><strong>01</strong><h3>Nhớ người dùng</h3><p>Preference, profile và open loop xuyên session.</p></div><div class="box"><strong>02</strong><h3>Nhớ sự kiện</h3><p>Episode cụ thể, quyết định và incident cũ.</p></div><div class="box"><strong>03</strong><h3>Nhớ kiến thức</h3><p>Policy domain dùng chung cho nhiều user.</p></div></div>
+    <div class="notes">Nhấn mạnh sự khác nhau giữa “memory retrieval” và “đưa toàn bộ lịch sử vào prompt”.</div>
+  </section>
+
+  <section class="slide" data-title="Solution">
+    <div class="eyebrow">Solution · luồng xử lý</div><h2>Một query đi qua bốn bước.</h2>
+    <div class="flow"><div class="box"><div class="num">01 / QUERY</div><h3>User hỏi</h3><p>Ví dụ: Quy tắc retry payment là gì?</p></div><div class="box"><div class="num">02 / ROUTE</div><h3>Chọn memory</h3><p>Router xác định layer liên quan.</p></div><div class="box"><div class="num">03 / RETRIEVE</div><h3>Tìm bằng chứng</h3><p>Search đúng user graph hoặc semantic graph.</p></div><div class="box"><div class="num">04 / ASSEMBLE</div><h3>Ghép context</h3><p>Cắt theo budget trước khi đưa vào model.</p></div></div>
+    <div class="notes">Đi từng bước từ trái sang phải, không giới thiệu công nghệ trước khi người nghe hiểu luồng.</div>
+  </section>
+
+  <section class="slide" data-title="Bốn lớp memory">
+    <div class="eyebrow">Kiến trúc memory</div><h2>Mỗi loại memory trả lời một câu hỏi khác nhau.</h2>
+    <div class="layers"><div class="layer"><div class="tag">SHORT-TERM</div><div><h3>“Vừa nói gì?”</h3><p>Turn gần nhất, summary và sliding window. Chạy local để nhanh.</p></div></div><div class="layer"><div class="tag">LONG-TERM</div><div><h3>“User là ai?”</h3><p>Zep Context Block, facts, preference và task dài hạn.</p></div></div><div class="layer"><div class="tag">EPISODIC</div><div><h3>“Đã xảy ra chuyện gì?”</h3><p>Episode cụ thể trong các session trước, có provenance.</p></div></div><div class="layer"><div class="tag">SEMANTIC</div><div><h3>“Quy tắc chung là gì?”</h3><p>Standalone graph chứa kiến thức domain không thuộc riêng user.</p></div></div></div>
+  </section>
+
+  <section class="slide" data-title="Demo">
+    <div class="eyebrow">Live demo · chuyển sang localhost:8501</div><h2>Cho người nghe thấy agent nhớ như thế nào.</h2>
+    <div class="demo"><div class="steps"><div class="step"><b>E02</b><p><strong>Long-term:</strong> Minh thích Python. Mở evidence Context Block.</p></div><div class="step"><b>E04</b><p><strong>Episodic:</strong> tìm lại `ASYNC-FIX-20`, ClientSession, concurrency=20.</p></div><div class="step"><b>E06</b><p><strong>Semantic:</strong> tìm `PAYMENT-RULE-3` từ graph dùng chung.</p></div><div class="step"><b>E07</b><p><strong>Mixed:</strong> ghép preference cá nhân với policy domain.</p></div></div><div class="screen"><strong>Trên UI, thao tác như sau:</strong><p style="color:#c6d7d2;font-size:15px">1. Chọn tình huống<br>2. Bấm “Chạy truy hồi”<br>3. Mở từng “Bằng chứng”<br>4. Nhập câu hỏi ở khung chat</p><span class="pill selected">long-term</span><span class="pill">episodic</span><span class="pill">semantic</span><span class="pill">context budget</span></div></div>
+    <div class="notes">Không demo cả 11 case. Chỉ cần E02 → E04 → E06 → E07 để câu chuyện tăng dần từ một layer tới mixed retrieval.</div>
+  </section>
+
+  <section class="slide" data-title="Kết quả">
+    <div class="eyebrow">Kết quả benchmark</div><h2>Memory giúp agent lấy đúng thông tin, không chỉ lấy nhiều thông tin.</h2>
+    <div class="metrics"><div class="metric"><strong>11/11</strong><span>case đạt</span></div><div class="metric"><strong>100%</strong><span>evidence hit rate</span></div><div class="metric"><strong>+81.8pt</strong><span>so với no-memory</span></div></div>
+    <div class="quote">“Chất lượng memory phụ thuộc vào routing đúng layer, search đúng scope và kiểm soát context budget.”</div>
+    <div class="notes">Nói rõ: benchmark chấm evidence deterministic, không để model tự bịa câu trả lời rồi tính là đúng.</div>
+  </section>
+
+  <section class="slide" data-title="Kết luận">
+    <div class="eyebrow">Kết luận · nhận xét</div><h2>Hybrid memory là lựa chọn thực tế.</h2>
+    <div class="closing"><ul><li>Local short-term cho tốc độ phản hồi.</li><li>Zep cho durable memory và graph retrieval.</li><li>Redis/Qdrant làm baseline hoặc local fallback.</li><li>Privacy phải đi cùng memory: có thể forget user.</li></ul><div class="takeaway"><h3>Thông điệp cuối</h3><p>Agent tốt không phải agent nhớ nhiều nhất. Đó là agent biết lúc nào cần nhớ gì, lấy từ đâu và đưa bao nhiêu vào context.</p></div></div>
+    <div class="notes">Kết thúc bằng thông điệp này, sau đó mời người nghe đặt câu hỏi về trade-off giữa managed memory và tự xây hệ thống.</div>
+  </section>
+</div>
+<div class="controls"><button id="prev" aria-label="Slide trước">←</button><button id="next" aria-label="Slide sau">→</button></div>
+<script>
+  const slides=[...document.querySelectorAll('.slide')]; let current=0;
+  function show(index){current=Math.max(0,Math.min(slides.length-1,index));slides.forEach((s,i)=>s.classList.toggle('active',i===current));document.getElementById('count').textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');document.title='Lab 17 · '+slides[current].dataset.title;}
+  document.getElementById('prev').onclick=()=>show(current-1);document.getElementById('next').onclick=()=>show(current+1);
+  document.addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key))show(current+1);if(['ArrowLeft','PageUp'].includes(e.key))show(current-1);if(e.key==='Home')show(0);if(e.key==='End')show(slides.length-1)});show(0);
+</script>
+</body>
+</html>

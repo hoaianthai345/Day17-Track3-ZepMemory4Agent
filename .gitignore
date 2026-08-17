@@ -6,3 +6,6 @@ __pycache__/
 data/golden_eval.json
 data/golden*.json
 !data/golden_eval.example.json
+golden_eval*.json
+reports/golden_benchmark*.json
+reports/golden_benchmark*.md

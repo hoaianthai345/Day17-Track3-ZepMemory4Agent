@@ -32,8 +32,11 @@ class ContextBudgetManager:
         # render both put the most salient content (top-ranked facts, session
         # summary + durable notes) at the HEAD, so keep the head and drop the
         # lower-priority tail.
-        max_chars = max_tokens * 4
-        return text[:max_chars] + "\n[...trimmed...]"
+        marker = "\n[...trimmed...]"
+        # Reserve room for the marker itself; otherwise a 240-token limit
+        # becomes 244 tokens after the marker is appended.
+        max_chars = max(1, max_tokens * 4 - len(marker))
+        return text[:max_chars] + marker
 
     def assemble(self, layers: dict[str, str]) -> tuple[str, dict[str, dict[str, int]]]:
         rendered: list[str] = []

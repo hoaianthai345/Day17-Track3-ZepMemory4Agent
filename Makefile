@@ -1,4 +1,4 @@
-.PHONY: up down build smoke seed demo student baseline compare test short local agent sessions episodes heartbeat compiled forget golden ui report student-report golden-report clean
+.PHONY: up down build smoke seed demo student baseline compare test short local agent sessions episodes heartbeat compiled forget golden ui presentation report student-report golden-report clean
 
 build:
 	docker compose build
@@ -59,6 +59,9 @@ golden:
 
 ui:
 	docker compose run --rm --service-ports -e PYTHONPATH=/workspace app streamlit run src/demo_ui.py --server.address 0.0.0.0 --server.port 8501
+
+presentation:
+	python3 -m http.server 8502 --bind 127.0.0.1
 
 # Build colorful HTML reports from every reports/*benchmark*.json (+ run log if present).
 report:
